@@ -31,7 +31,7 @@ func (c *consumer[T]) Consume(ctx context.Context) (T, error) {
 			case <-ctx.Done():
 				buffer.c.Signal()
 				buffer.rwm.Lock()
-				return *new(T), fmt.Errorf("consumer operation was cancelled")
+				return *new(T), fmt.Errorf("consumer operation was cancelled: %w", ctx.Err())
 			case <-utils.ChannelizeOnce[struct{}, utils.GeneratorFunc[struct{}]](waitContext, func(ctx context.Context) struct{} {
 				buffer.c.Wait()
 				return struct{}{}
